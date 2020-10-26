@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.dunnysoft'
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
 
 }

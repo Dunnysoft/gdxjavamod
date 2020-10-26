@@ -6,10 +6,19 @@ Specifically designed for use with LibGDX, with more generic usage also availabl
 
 *Gradle*
 
-Add the following to your *build.gradle* in the *core* project folder:
+Check [jitpack](https://jitpack.io/#Dunnysoft/gdxjavamod)
+Add the following line to your *build.properties* in the *root* project folder
 
 ```
-* implementation 'com.github.Dunnysoft:gdxjavamod:master-SNAPSHOT'
+gdxJavaModVer=VERSION
+```
+Change 'VERSION' to the latest jitpack version
+
+Add the following to your *build.gradle* in the *core* project folder:
+
+
+```
+implementation 'com.github.Dunnysoft:gdxjavamod:gdxJavaModVer'
 ```
 
 **How to Use** (to be further refined)
