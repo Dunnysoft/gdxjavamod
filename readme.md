@@ -1,4 +1,4 @@
-gdxjavamod - A port of JavaMod by Daniel Becker (https://www.quippy.de/mod_en.php)
+gdxjavamod - A port of JavaMod 2.9 by Daniel Becker (https://www.quippy.de/mod_en.php)
 
 Specifically designed for use with LibGDX, with more generic usage also available and to be expanded.
 
