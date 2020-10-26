@@ -7,10 +7,10 @@ version '0.01'
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
 }
