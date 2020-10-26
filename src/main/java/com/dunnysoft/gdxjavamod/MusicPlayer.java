@@ -73,10 +73,13 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
 
     }
 
+    /**
+     * Load a LibGDX FileHandle into the music player.
+     * @param fh
+     */
     public void createMixer(FileHandle fh) {
         createMixer(convertUrl(fh));
     }
-
 
     /**
      * Change the Balance.  -1.0f to 1.0f
