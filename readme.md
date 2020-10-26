@@ -18,7 +18,7 @@ Add the following to your *build.gradle* in the *core* project folder:
 
 
 ```
-implementation 'com.github.Dunnysoft:gdxjavamod:gdxJavaModVer'
+api "com.github.Dunnysoft:gdxjavamod:$gdxJavaModVer"
 ```
 
 **How to Use** (to be further refined)
