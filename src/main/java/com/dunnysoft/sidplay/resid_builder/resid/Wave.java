@@ -30,8 +30,8 @@ import java.io.IOException;
  */
 public class Wave
 {
-	private static final String RESSOURCE_PATH_6581 = "/de/quippy/sidplay/resid_builder/resid/WAVE6581";
-	private static final String RESSOURCE_PATH_8580 = "/de/quippy/sidplay/resid_builder/resid/WAVE8580";
+	private static final String RESSOURCE_PATH_6581 = "/com/dunnysoft/sidplay/resid_builder/resid/WAVE6581";
+	private static final String RESSOURCE_PATH_8580 = "/com/dunnysoft/sidplay/resid_builder/resid/WAVE8580";
 
 	public static final int wave6581__ST[] = new int[4096];
 	public static final int wave6581_P_T[] = new int[4096];
@@ -54,7 +54,8 @@ public class Wave
 //		writeArrayToStream(Helpers.HOMEDIR + "/WAVE8580_P_T", IWave8580.wave8580_P_T);
 //		writeArrayToStream(Helpers.HOMEDIR + "/WAVE8580_PS_", IWave8580.wave8580_PS_);
 //		writeArrayToStream(Helpers.HOMEDIR + "/WAVE8580_PST", IWave8580.wave8580_PST);
-		
+
+		/* TB worked on later?
 		//LOAD:
 		readArrayFromStream(RESSOURCE_PATH_6581 + "__ST", wave6581__ST);
 		readArrayFromStream(RESSOURCE_PATH_6581 + "_P_T", wave6581__ST);
@@ -64,6 +65,8 @@ public class Wave
 		readArrayFromStream(RESSOURCE_PATH_8580 + "_P_T", wave8580__ST);
 		readArrayFromStream(RESSOURCE_PATH_8580 + "_PS_", wave8580__ST);
 		readArrayFromStream(RESSOURCE_PATH_8580 + "_PST", wave8580__ST);
+
+		 */
 	}
 	
 //	private static void writeArrayToStream(final String ressourcePath, final int [] array)
