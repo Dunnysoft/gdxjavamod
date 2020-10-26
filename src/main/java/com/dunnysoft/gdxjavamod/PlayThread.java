@@ -37,7 +37,7 @@ public final class PlayThread extends Thread implements Serializable
 	private transient final Mixer currentMixer;
 	private final PlayThreadEventListener listener;
 	private volatile boolean isRunning;
-	private volatile boolean finishedNormaly;
+	private volatile boolean finishedNormally;
 	
 	public PlayThread(Mixer currentMixer, PlayThreadEventListener listener)
 	{
@@ -45,16 +45,18 @@ public final class PlayThread extends Thread implements Serializable
 			throw new IllegalArgumentException("Provided Mixer was NULL");
 		this.currentMixer = currentMixer;
 		this.isRunning = false;
-		this.finishedNormaly = false;
+		this.finishedNormally = false;
 		this.listener = listener;
 		this.setName("PlayThread");
 		this.setDaemon(true);
 		try { this.setPriority(Thread.MAX_PRIORITY); } catch (SecurityException ex) { /*NOOP*/ }
 	}
+
 	private void informListener()
 	{
-		listener.playThreadEventOccured(this);
+		listener.playThreadEventOccurred(this);
 	}
+
 	public void stopMod()
 	{
 		if (isRunning)
@@ -79,15 +81,15 @@ public final class PlayThread extends Thread implements Serializable
 	{
 		return isRunning;
 	}
-	public boolean getHasFinishedNormaly()
+	public boolean getHasFinishedNormally()
 	{
-		return finishedNormaly;
+		return finishedNormally;
 	}
 	@Override
 	public void run()
 	{
 		this.isRunning = true;
-		this.finishedNormaly = false;
+		this.finishedNormally = false;
 		informListener();
 		try
 		{
@@ -98,7 +100,7 @@ public final class PlayThread extends Thread implements Serializable
 			Log.error("[PlayThread::run]", ex);
 		}
 		this.isRunning = false;
-		this.finishedNormaly = getCurrentMixer().hasFinished();
+		this.finishedNormally = getCurrentMixer().hasFinished();
 		informListener();
 	}
 }
