@@ -857,8 +857,7 @@ public class Helpers
 		Class.forName("com.dunnysoft.gdxjavamod.multimedia.ape.APEContainer");
 		Class.forName("com.dunnysoft.gdxjavamod.multimedia.flac.FLACContainer");
 		Class.forName("com.dunnysoft.gdxjavamod.multimedia.sid.SIDContainer");
-		Class.forName("com.dunnysoft.gdxjavamod.multimedia.opl3.OPL3Container");
-		
+
 		// SID WAVE Loading
 		Class.forName("com.dunnysoft.sidplay.resid_builder.resid.Wave");
 	}
