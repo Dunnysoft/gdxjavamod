@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group 'com.dunnysoft'
+version '0.01'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+}
