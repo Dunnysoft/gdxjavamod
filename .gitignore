@@ -2,3 +2,35 @@
 /.gradle/
 /build/
 /build/classes/java/main/
+
+# Build and Release Folders
+build/
+target/
+out/
+*.class
+*.iml
+.idea/
+.settings/
+.attach_pid*
+
+# Gradle temporary files
+.gradle/
+
+# jEdit garbage
+*~
+*#*#
+*#*.*#
+/bin/
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Mac junk
+.DS_Store
