@@ -337,7 +337,7 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
         System.out.println("Tracker name: " + modTrackerName);
         System.out.println("Song length: " + modSongLength);
         System.out.println("Number of Patterns: " + patterns.length);
-        System.out.println("Information" + songInfos);
+        System.out.println("Information: \n" + songInfos);
     }
 
 
