@@ -28,6 +28,7 @@ import javax.sound.sampled.AudioFormat;
 import com.dunnysoft.gdxjavamod.io.SoundOutputStream;
 import com.dunnysoft.gdxjavamod.io.SoundOutputStreamImpl;
 import com.dunnysoft.gdxjavamod.mixer.dsp.AudioProcessor;
+import com.dunnysoft.gdxjavamod.multimedia.mod.loader.Module;
 
 /**
  * @author Daniel Becker
@@ -98,7 +99,7 @@ public abstract class Mixer
 	 * the Balance of the sound output, but never the wav writer
 	 * This will only succeed, if "openAudioDevice" was called once!
 	 * @since 01.11.2008
-	 * @param newVolume
+	 * @param newBalance
 	 */
 	public void setBalance(float newBalance)
 	{
@@ -107,7 +108,7 @@ public abstract class Mixer
 	}
 	/**
 	 * Delete external stream by setting it to null.
-	 * @param outputStream the outputStream to set
+	 * @param newOutputStream the outputStream to set
 	 * @since 25.02.2011
 	 */
 	public void setSoundOutputStream(SoundOutputStream newOutputStream)
@@ -122,7 +123,7 @@ public abstract class Mixer
 		this.exportFile = exportFile;
 	}
 	/**
-	 * @param exportFile the exportFile to set
+	 * @param exportFileName the exportFile to set
 	 */
 	public void setExportFile(String exportFileName)
 	{

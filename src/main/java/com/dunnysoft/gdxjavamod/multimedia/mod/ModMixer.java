@@ -189,7 +189,7 @@ public class ModMixer extends BasicMixer
 		modMixer.changeISP(doISP);
 	}
 	/**
-	 * @param myBufferSize
+	 * @param msBufferSize
 	 */
 	public void setBufferSize(final int msBufferSize)
 	{
@@ -306,7 +306,7 @@ public class ModMixer extends BasicMixer
 		if (wasPlaying) pausePlayback();
 	}
 	/**
-	 * @param ditherFilterType the ditherFilterType to set
+	 * @param newDitherFilterType the ditherFilterType to set
 	 */
 	public void setDitherFilterType(final int newDitherFilterType)
 	{
@@ -331,7 +331,7 @@ public class ModMixer extends BasicMixer
 		}
 	}
 	/**
-	 * @param ditherType the ditherType to set
+	 * @param newDitherType the ditherType to set
 	 */
 	public void setDitherType(final int newDitherType)
 	{
@@ -356,7 +356,7 @@ public class ModMixer extends BasicMixer
 		}
 	}
 	/**
-	 * @param ditherByPass set if dither is bypass
+	 * @param newByPassDither set if dither is bypass
 	 */
 	public void setDitherByPass(final boolean newByPassDither)
 	{
@@ -613,4 +613,5 @@ public class ModMixer extends BasicMixer
 			closeAudioDevice();
 		}
 	}
+
 }

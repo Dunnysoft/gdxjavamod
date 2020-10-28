@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.dunnysoft'
-version 'v0.5-beta'
+version 'v0.51-beta'
 
 repositories {
     mavenLocal()

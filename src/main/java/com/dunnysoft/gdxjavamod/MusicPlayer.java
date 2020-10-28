@@ -1,6 +1,5 @@
 package com.dunnysoft.gdxjavamod;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.dunnysoft.gdxjavamod.io.GaplessSoundOutputStreamImpl;
 import com.dunnysoft.gdxjavamod.io.SoundOutputStream;
@@ -14,11 +13,15 @@ import com.dunnysoft.gdxjavamod.multimedia.MultimediaContainerEvent;
 import com.dunnysoft.gdxjavamod.multimedia.MultimediaContainerEventListener;
 import com.dunnysoft.gdxjavamod.multimedia.MultimediaContainerManager;
 import com.dunnysoft.gdxjavamod.multimedia.mod.ModContainer;
+import com.dunnysoft.gdxjavamod.multimedia.mod.loader.ModuleFactory;
+import com.dunnysoft.gdxjavamod.multimedia.mod.loader.Module;
+import com.dunnysoft.gdxjavamod.multimedia.mod.loader.pattern.Pattern;
 import com.dunnysoft.gdxjavamod.system.Helpers;
 import com.dunnysoft.gdxjavamod.system.Log;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
@@ -37,6 +40,17 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
     private float currentBalance; /* -1.0 - 1.0 */
     private boolean useGaplessAudio;
     private boolean paused;
+    private URL currUrl;
+    private Module currentMod;
+
+    // Mod Details;
+    private String modFileName;
+    private String modSongName;
+    private String modTrackerName;
+    private int modSongLength;
+    private int modArrangement[];
+    private Pattern patterns[];
+    private StringBuilder songInfos;
 
     /**
      *  Make sure you run the constructor to initialise the Helpers class, which does things.
@@ -50,6 +64,7 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
     }
 
     public void createMixer(URL url) {
+        this.currUrl = url;
         properties = new Properties();
 
         properties.setProperty(ModContainer.PROPERTY_PLAYER_ISP, "3");
@@ -71,6 +86,7 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
             e.printStackTrace();
         }
 
+        setModDetails();
     }
 
     /**
@@ -276,6 +292,54 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
             return null;
         }
     }
+
+    /**
+     * Return the length of the song in milliseconds
+     * @return
+     */
+    public long getSongLength() {
+        return mixer.getLengthInMilliseconds();
+    }
+
+    /**
+     * Playback from the start of the given pattern index (not implemented)
+     * @param patternIndex
+     */
+    public void seekPattern(int patternIndex) {
+    }
+
+    public void setModDetails() {
+        try {
+            currentMod = ModuleFactory.getInstance(currUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        modFileName = currentMod.getFileName();
+        modSongName = currentMod.getSongName();
+        modTrackerName = currentMod.toShortInfoString();
+        modSongLength = currentMod.getSongLength();
+        modArrangement = currentMod.getArrangement();
+        patterns = currentMod.getPatternContainer().getPattern();
+        songInfos = new StringBuilder();
+        String songMessage = currentMod.getSongMessage();
+        if (songMessage!=null && songMessage.length()>0) songInfos.append("Song Message:\n").append(songMessage).append("\n\n");
+        songInfos.append(currentMod.getInstrumentContainer().toString());
+
+
+    }
+
+    /**
+     * Dumps the gathered details about the current mod to the standard output
+     */
+    public void printModDetails() {
+        System.out.println("Filename: "+ modFileName);
+        System.out.println("Song name: " + modSongName);
+        System.out.println("Tracker name: " + modTrackerName);
+        System.out.println("Song length: " + modSongLength);
+        System.out.println("Number of Patterns: " + patterns.length);
+        System.out.println("Information" + songInfos);
+    }
+
 
     public Properties getProperties() {
         return properties;
