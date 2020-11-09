@@ -72,29 +72,26 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
 
     public void createMixer(URL url) {
         this.currUrl = url;
-        Thread t = new Thread(() -> {
-            properties = new Properties();
+        properties = new Properties();
 
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_ISP, "3");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_STEREO, "2");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_WIDESTEREOMIX, "FALSE");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_NOISEREDUCTION, "FALSE");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_NOLOOPS, "1");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_ISP, "3");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_STEREO, "2");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_WIDESTEREOMIX, "FALSE");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_NOISEREDUCTION, "FALSE");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_NOLOOPS, "1");
 
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_MEGABASS, "TRUE");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_BITSPERSAMPLE, "16");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_FREQUENCY, "48000");
-            properties.setProperty(ModContainer.PROPERTY_PLAYER_MSBUFFERSIZE, "30");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_MEGABASS, "TRUE");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_BITSPERSAMPLE, "16");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_FREQUENCY, "48000");
+        properties.setProperty(ModContainer.PROPERTY_PLAYER_MSBUFFERSIZE, "30");
 
-            MultimediaContainerManager.configureContainer(properties);
-            try {
-                MultimediaContainer newContainer = MultimediaContainerManager.getMultimediaContainer(url);
-                currentContainer = newContainer;
-            } catch (UnsupportedAudioFileException e) {
-                e.printStackTrace();
-            }
-        });
-        t.start();
+        MultimediaContainerManager.configureContainer(properties);
+        try {
+            MultimediaContainer newContainer = MultimediaContainerManager.getMultimediaContainer(url);
+            currentContainer = newContainer;
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        }
         setModDetails();
         currentBalance = 0;
         currentVolume = 1;
