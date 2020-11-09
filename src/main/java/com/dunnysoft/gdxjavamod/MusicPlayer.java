@@ -16,6 +16,8 @@ import com.dunnysoft.gdxjavamod.multimedia.mod.ModContainer;
 import com.dunnysoft.gdxjavamod.multimedia.mod.loader.ModuleFactory;
 import com.dunnysoft.gdxjavamod.multimedia.mod.loader.Module;
 import com.dunnysoft.gdxjavamod.multimedia.mod.loader.pattern.Pattern;
+import com.dunnysoft.gdxjavamod.playlist.PlayList;
+import com.dunnysoft.gdxjavamod.playlist.PlayListEntry;
 import com.dunnysoft.gdxjavamod.system.Helpers;
 import com.dunnysoft.gdxjavamod.system.Log;
 
@@ -23,7 +25,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class MusicPlayer implements PlayThreadEventListener, MultimediaContainerEventListener {
@@ -35,12 +39,14 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
     private GraphicEQ currentEqualizer;
     private PitchShift currentPitchShift;
     private AudioProcessor audioProcessor;
+    private PlayList playlist;
     private transient SoundOutputStream soundOutputStream;
     private float currentVolume; /* 0.0 - 1.0 */
     private float currentBalance; /* -1.0 - 1.0 */
     private boolean useGaplessAudio;
     private boolean paused;
     private URL currUrl;
+    private ArrayList<URL> lastLoaded;
     private Module currentMod;
 
     // Mod Details;
@@ -49,6 +55,7 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
     private String modTrackerName;
     private int modSongLength;
     private int modArrangement[];
+    private String modInstruments;
     private Pattern patterns[];
     private StringBuilder songInfos;
 
@@ -65,28 +72,34 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
 
     public void createMixer(URL url) {
         this.currUrl = url;
-        properties = new Properties();
+        Thread t = new Thread(() -> {
+            properties = new Properties();
 
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_ISP, "3");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_STEREO, "2");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_WIDESTEREOMIX, "FALSE");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_NOISEREDUCTION, "FALSE");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_NOLOOPS, "1");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_ISP, "3");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_STEREO, "2");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_WIDESTEREOMIX, "FALSE");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_NOISEREDUCTION, "FALSE");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_NOLOOPS, "1");
 
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_MEGABASS, "TRUE");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_BITSPERSAMPLE, "16");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_FREQUENCY, "48000");
-        properties.setProperty(ModContainer.PROPERTY_PLAYER_MSBUFFERSIZE, "30");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_MEGABASS, "TRUE");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_BITSPERSAMPLE, "16");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_FREQUENCY, "48000");
+            properties.setProperty(ModContainer.PROPERTY_PLAYER_MSBUFFERSIZE, "30");
 
-        MultimediaContainerManager.configureContainer(properties);
-        try {
-            MultimediaContainer newContainer = MultimediaContainerManager.getMultimediaContainer(url);
-            currentContainer = newContainer;
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        }
-
+            MultimediaContainerManager.configureContainer(properties);
+            try {
+                MultimediaContainer newContainer = MultimediaContainerManager.getMultimediaContainer(url);
+                currentContainer = newContainer;
+            } catch (UnsupportedAudioFileException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
         setModDetails();
+        currentBalance = 0;
+        currentVolume = 1;
+        setVolume(currentVolume);
+        setBalance(currentBalance);
     }
 
     /**
@@ -118,6 +131,147 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
             mixer.setVolume(vol);
         }
     }
+
+    /**
+     * Decrement the volume by 0.1
+     */
+    public void decVolume() {
+        if (currentVolume > 0) {
+            currentVolume -= 0.1f;
+        }
+        if (currentVolume < 0) {
+            currentVolume = 0;
+        }
+        if (playerThread != null) {
+            mixer.setVolume(currentVolume);
+        }
+    }
+
+    /**
+     * Decrement the volume by the given amount
+     * @param decAmount
+     */
+    public void decVolume(float decAmount) {
+        if (currentVolume > 0) {
+            currentVolume -= decAmount;
+        }
+        if (currentVolume < 0) {
+            currentVolume = 0;
+        }
+        if (playerThread != null) {
+            mixer.setVolume(currentVolume);
+        }
+    }
+
+    /**
+     * Increment the volume by 0.1
+     */
+    public void incVolume() {
+        if (currentVolume < 1) {
+            currentVolume += 0.1f;
+        }
+        if (currentVolume > 1) {
+            currentVolume = 1;
+        }
+        if (playerThread != null) {
+            mixer.setVolume(currentVolume);
+        }
+    }
+
+    /**
+     * Increment the volume by the given amount
+     * @param incAmount
+     */
+    public void incVolume(float incAmount) {
+        if (currentVolume < 1) {
+            currentVolume += incAmount;
+        }
+        if (currentVolume > 1) {
+            currentVolume = 1;
+        }
+        if (playerThread != null) {
+            mixer.setVolume(currentVolume);
+        }
+    }
+
+    /**
+     * Reset the balance to centre
+     */
+    public void resetBalance() {
+        currentBalance = 0;
+        mixer.setBalance(0);
+    }
+
+    /**
+     * Increment the balance by 0.1
+     */
+    public void decBalance() {
+        if (currentBalance > -1) {
+            currentBalance -= 0.1f;
+        }
+        if (currentBalance < -1) {
+            currentBalance = -1;
+        }
+        if (playerThread != null) {
+            mixer.setBalance(currentBalance);
+        }
+    }
+
+    /**
+     * Increment the balance by the given amount
+     * @param decAmount
+     */
+    public void decBalance(float decAmount) {
+        if (currentBalance > -1) {
+            currentBalance -= decAmount;
+        }
+        if (currentBalance < -1) {
+            currentBalance = -1;
+        }
+        if (playerThread != null) {
+            mixer.setBalance(currentBalance);
+        }
+    }
+
+    /**
+     * Increment the balance by 0.1
+     */
+    public void incBalance() {
+        if (currentBalance < 1) {
+            currentBalance += 0.1f;
+        }
+        if (currentBalance > 1) {
+            currentBalance = 1;
+        }
+        if (playerThread != null) {
+            mixer.setBalance(currentBalance);
+        }
+    }
+
+    /**
+     * Increment the balance by the given amount
+     * @param incAmount
+     */
+    public void incBalance(float incAmount) {
+        if (currentBalance < 1) {
+            currentBalance += incAmount;
+        }
+        if (currentBalance > 1) {
+            currentBalance = 1;
+        }
+        if (playerThread != null) {
+            mixer.setBalance(currentBalance);
+        }
+    }
+
+    public float getVolume() {
+        return currentVolume;
+    }
+
+    public float getBalance() {
+        return currentBalance;
+    }
+
 
 
     /**
@@ -309,6 +463,15 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
     }
 
     public void setModDetails() {
+        if (playlist != null) {
+            try {
+                currUrl = playlist.getCurrentEntry().getFile().toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             currentMod = ModuleFactory.getInstance(currUrl);
         } catch (IOException e) {
@@ -323,9 +486,7 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
         songInfos = new StringBuilder();
         String songMessage = currentMod.getSongMessage();
         if (songMessage!=null && songMessage.length()>0) songInfos.append("Song Message:\n").append(songMessage).append("\n\n");
-        songInfos.append(currentMod.getInstrumentContainer().toString());
-
-
+        modInstruments = currentMod.getInstrumentContainer().toString();
     }
 
     /**
@@ -357,12 +518,138 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
         this.paused = paused;
     }
 
-    public float getCurrentVolume() {
-        return currentVolume;
+    public void setPlaylist(PlayList newPlaylist) {
+        if (newPlaylist != null) {
+            if (newPlaylist != playlist) {
+                boolean playlistEmpty = playlist == null;
+                playlist = newPlaylist;
+                if (playlistEmpty) doNextPlaylistEntry();
+            }
+        }
     }
 
-    public float getCurrentBalance() {
-        return currentBalance;
+    public boolean doNextPlaylistEntry() {
+        boolean ok = false;
+        while (playlist != null && playlist.hasNext() && !ok) {
+            playlist.next();
+            setModDetails();
+            ok = loadMultimediaFile(playlist.getCurrentEntry());
+        }
+        return ok;
+    }
+
+    public boolean doPreviousPlaylistEntry() {
+        boolean ok = false;
+        while (playlist != null && playlist.hasPrevious() && !ok) {
+            playlist.previous();
+            setModDetails();
+            ok = loadMultimediaFile(playlist.getCurrentEntry());
+        }
+        return ok;
+    }
+
+    public void playSelectedPlaylistEntry() {
+        boolean ok = false;
+        while (playlist != null && !ok) {
+            final PlayListEntry entry = playlist.getCurrentEntry();
+            ok = loadMultimediaFile(entry);
+            if (!ok) playlist.next();
+            else
+                if (playerThread == null) doStartPlaying(true, entry.getTimeIndex());
+        }
+        setModDetails();
+    }
+
+    /**
+     * @since 14.09.2008
+     * @param url
+     */
+    private void addFileToLastLoaded(URL url)
+    {
+        if (lastLoaded.contains(url)) lastLoaded.remove(url);
+        lastLoaded.add(0, url);
+    }
+
+    /**
+     * @since 14.09.2008
+     * @param mediaPLSFileURL
+     */
+    private boolean loadMultimediaOrPlayListFile(URL mediaPLSFileURL)
+    {
+        Log.info(Helpers.EMPTY_STING);
+        addFileToLastLoaded(mediaPLSFileURL);
+        playlist = null;
+        try
+        {
+            playlist = PlayList.createFromFile(mediaPLSFileURL, false, false);
+            if (playlist!=null)
+            {
+                return doNextPlaylistEntry();
+            }
+        }
+        catch (Throwable ex)
+        {
+            Log.error("[MainForm::loadMultimediaOrPlayListFile]", ex);
+            playlist = null;
+        }
+        return false;
+    }
+
+
+    /**
+     * load a mod file and display it - modified by David Pardy for gdxjavamod 2020-11-09
+     * @since 01.07.2006
+     * @param playListEntry
+     * @return boolean if loading succeeded
+     */
+    private boolean loadMultimediaFile(PlayListEntry playListEntry) {
+        final URL mediaFileURL = playListEntry.getFile();
+        final boolean reuseMixer = (currentContainer!=null &&
+                Helpers.isEqualURL(currentContainer.getFileURL(), mediaFileURL) &&
+                playerThread != null && playerThread.isRunning());
+
+        if (!reuseMixer)
+        {
+            try
+            {
+                if (mediaFileURL!=null)
+                {
+                    MultimediaContainer newContainer = MultimediaContainerManager.getMultimediaContainer(mediaFileURL);
+                    if (newContainer!=null)
+                    {
+                        currentContainer = newContainer;
+                    }
+                }
+            }
+            catch (Throwable ex)
+            {
+                Log.error("[MainForm::loadMultimediaFile] Loading of " + mediaFileURL + " failed!", ex);
+                return false;
+            }
+        }
+        // if we are currently playing, start the current piece:
+        if (playerThread!=null) doStartPlaying(reuseMixer, playListEntry.getTimeIndex());
+        return true;
+    }
+
+    public String getModFileName() {
+        return modFileName;
+    }
+
+    public String getModSongName() {
+        return modSongName;
+    }
+
+    public String getModTrackerName() {
+        return modTrackerName;
+    }
+
+    public int getModSongLength() {
+        return modSongLength;
+    }
+
+    public StringBuilder getSongInfos() {
+        return songInfos;
     }
 
     @Override
@@ -374,8 +661,7 @@ public class MusicPlayer implements PlayThreadEventListener, MultimediaContainer
         {
             if (thread.getHasFinishedNormally())
             {
-                // boolean ok = doNextPlayListEntry();  // do this later
-                boolean ok = false;                     // We'll stop the thread here
+                boolean ok = doNextPlaylistEntry();  // do this later
                 if (!ok) doStopPlaying();
             }
         }
